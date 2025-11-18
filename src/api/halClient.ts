@@ -25,3 +25,25 @@ export async function fetchHal(path: string, options: RequestInit = {}) {
 
     return halfred.parse(await res.json());
 }
+
+export async function postHal(path: string, body: Resource, options: RequestInit = {}) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+
+    const res = await fetch(url, {
+        method: "POST",
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/hal+json",
+            ...options.headers
+        },
+        body: JSON.stringify(body),
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status} posting ${JSON.stringify(body)}`)
+    }
+
+    return halfred.parse(await res.json());
+}
