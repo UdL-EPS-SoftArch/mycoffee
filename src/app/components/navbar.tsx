@@ -12,6 +12,8 @@ export default function Navbar() {
 
     const navLinks = [
         {href: "/", label: "Home"},
+        // Aquí está el nuevo botón:
+        {href: "/business", label: "Business"},
         {href: "/users", label: "Users", roles: ["ROLE_USER"]}
     ];
 
