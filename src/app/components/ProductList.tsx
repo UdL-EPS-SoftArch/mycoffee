@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "@/app/components/SearchBar";
+import { SearchBar } from "@/app/components/searchBar";
 
 // Definim una interfície simple per al component de visualització
 // Ja no depenem de la interfície complexa 'Product' amb Halfred aquí
