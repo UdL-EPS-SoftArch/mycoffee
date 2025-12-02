@@ -15,7 +15,24 @@ type ProductFormData = {
   price: number;
   description?: string;
   stock?: number;
+  brand?: string;
+  size?: string;
+  barcode?: string;
+
   available?: boolean;
+  partOfLoyaltyProgram?: boolean;
+
+  rating?: number;
+  pointsGiven?: number;
+  pointsCost?: number;
+
+  kcal?: number;
+  carbs?: number;
+  proteins?: number;
+  fats?: number;
+
+  ingredients?: string; 
+  allergens?: string;   
 };
 
 export default function NewProductPage() {
@@ -45,6 +62,29 @@ export default function NewProductPage() {
         description: data.description,
         stock: data.stock ? Number(data.stock) : 0,
         available: data.available ?? true,
+
+        // NEW FIELDS
+        brand: data.brand,
+        size: data.size,
+        barcode: data.barcode,
+
+        partOfLoyaltyProgram: data.partOfLoyaltyProgram,
+        rating: data.rating ? Number(data.rating) : undefined,
+        pointsGiven: data.pointsGiven ? Number(data.pointsGiven) : undefined,
+        pointsCost: data.pointsCost ? Number(data.pointsCost) : undefined,
+
+        kcal: data.kcal ? Number(data.kcal) : undefined,
+        carbs: data.carbs ? Number(data.carbs) : undefined,
+        proteins: data.proteins ? Number(data.proteins) : undefined,
+        fats: data.fats ? Number(data.fats) : undefined,
+
+        ingredients: data.ingredients
+          ? data.ingredients.split(",").map((i) => i.trim())
+          : [],
+
+        allergens: data.allergens
+          ? data.allergens.split(",").map((a) => a.trim())
+          : [],
       };
 
       await createProduct(productData);
@@ -73,15 +113,14 @@ export default function NewProductPage() {
                 </div>
               )}
 
+              {/* NAME */}
               <div className="space-y-2">
                 <Label htmlFor="name">
                   Product Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="name"
-                  {...register("name", {
-                    required: "Product name is required",
-                  })}
+                  {...register("name", { required: "Product name is required" })}
                   placeholder="e.g., Espresso Roast"
                 />
                 {errors.name && (
@@ -89,6 +128,7 @@ export default function NewProductPage() {
                 )}
               </div>
 
+              {/* PRICE */}
               <div className="space-y-2">
                 <Label htmlFor="price">
                   Price (€) <span className="text-red-500">*</span>
@@ -108,6 +148,7 @@ export default function NewProductPage() {
                 )}
               </div>
 
+              {/* DESCRIPTION */}
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <textarea
@@ -118,6 +159,7 @@ export default function NewProductPage() {
                 />
               </div>
 
+              {/* STOCK */}
               <div className="space-y-2">
                 <Label htmlFor="stock">Stock Quantity</Label>
                 <Input
@@ -133,6 +175,7 @@ export default function NewProductPage() {
                 )}
               </div>
 
+              {/* AVAILABLE */}
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -145,14 +188,92 @@ export default function NewProductPage() {
                 </Label>
               </div>
 
+              {/* BRAND */}
+              <div className="space-y-2">
+                <Label htmlFor="brand">Brand</Label>
+                <Input id="brand" {...register("brand")} placeholder="Lavazza, Nespresso..." />
+              </div>
+
+              {/* SIZE */}
+              <div className="space-y-2">
+                <Label htmlFor="size">Size</Label>
+                <Input id="size" {...register("size")} placeholder="250g, 1kg..." />
+              </div>
+
+              {/* BARCODE */}
+              <div className="space-y-2">
+                <Label htmlFor="barcode">Barcode</Label>
+                <Input id="barcode" {...register("barcode")} placeholder="EAN-13..." />
+              </div>
+
+              {/* LOYALTY */}
+              <div className="flex items-center space-x-2">
+                <input type="checkbox" id="partOfLoyaltyProgram" {...register("partOfLoyaltyProgram")} />
+                <Label htmlFor="partOfLoyaltyProgram" className="cursor-pointer">
+                  Part of loyalty program
+                </Label>
+              </div>
+
+              {/* RATING */}
+              <div className="space-y-2">
+                <Label htmlFor="rating">Rating (0–5)</Label>
+                <Input id="rating" type="number" step="0.1" min={0} max={5} {...register("rating")} />
+              </div>
+
+              {/* POINTS */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="pointsGiven">Points Given</Label>
+                  <Input id="pointsGiven" type="number" {...register("pointsGiven")} />
+                </div>
+                <div>
+                  <Label htmlFor="pointsCost">Points Cost</Label>
+                  <Input id="pointsCost" type="number" {...register("pointsCost")} />
+                </div>
+              </div>
+
+              {/* NUTRITION */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="kcal">kcal</Label>
+                  <Input id="kcal" type="number" {...register("kcal")} />
+                </div>
+                <div>
+                  <Label htmlFor="carbs">Carbs (g)</Label>
+                  <Input id="carbs" type="number" {...register("carbs")} />
+                </div>
+                <div>
+                  <Label htmlFor="proteins">Proteins (g)</Label>
+                  <Input id="proteins" type="number" {...register("proteins")} />
+                </div>
+                <div>
+                  <Label htmlFor="fats">Fats (g)</Label>
+                  <Input id="fats" type="number" {...register("fats")} />
+                </div>
+              </div>
+
+              {/* INGREDIENTS */}
+              <div className="space-y-2">
+                <Label htmlFor="ingredients">Ingredients (comma separated)</Label>
+                <Input
+                  id="ingredients"
+                  {...register("ingredients")}
+                  placeholder="coffee, sugar, milk..."
+                />
+              </div>
+
+              {/* ALLERGENS */}
+              <div className="space-y-2">
+                <Label htmlFor="allergens">Allergens (comma separated)</Label>
+                <Input id="allergens" {...register("allergens")} placeholder="milk, gluten..." />
+              </div>
+
+              {/* BUTTONS */}
               <div className="flex gap-4 pt-4">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1"
-                >
+                <Button type="submit" disabled={isSubmitting} className="flex-1">
                   {isSubmitting ? "Creating..." : "Create Product"}
                 </Button>
+
                 <Button
                   type="button"
                   variant="outline"
