@@ -1,20 +1,29 @@
 import { ProductService } from "@/api/productApi";
+import { UsersService } from "@/api/userApi"; // <--- 1. Importem el servei d'usuaris
 import ProductList from "@/app/components/ProductList";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react"; 
-// Importa el teu provider directament, no cal importar 'cookies' aquí
 import { serverAuthProvider } from "@/lib/authProvider"; 
 
 export default async function ProductsPage() {
     
-    // 1. Instanciem el servei utilitzant el serverAuthProvider que ja tens definit
-    // (Aquest ja gestiona el 'await cookies()' internament correctament)
+    
     const productService = new ProductService(serverAuthProvider);
+    const usersService = new UsersService(serverAuthProvider); 
 
-    // 2. Cridem al backend
-    const products = await productService.getProducts();
+    
+    const [products, currentUser] = await Promise.all([
+        productService.getProducts(),
+        usersService.getCurrentUser()
+    ]);
 
+    
+    const isAdmin = currentUser?.authorities?.some(
+        auth => auth.authority === "ROLE_ADMIN"
+    );
+
+    
     const cleanProducts = products.map((product) => ({
         id: product.link("self")?.href.split("/").pop() || "#",
         name: product.name,
@@ -29,12 +38,17 @@ export default async function ProductsPage() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold">Our Coffee Products</h1>
-                    <Button asChild>
-                        <Link href="/products/new">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create Product
-                        </Link>
-                    </Button>
+                    
+                    {/* Renderitzat condicional: Només es mostra si isAdmin és true */}
+                    {isAdmin && (
+                        <Button asChild>
+                            <Link href="/products/new">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Product
+                            </Link>
+                        </Button>
+                    )}
+
                 </div>
 
                 {cleanProducts.length === 0 ? (
