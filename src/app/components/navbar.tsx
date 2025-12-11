@@ -11,9 +11,10 @@ export default function Navbar() {
     const { user } = useAuth();
 
     const navLinks = [
-        { href: "/", label: "Home" },
-        { href: "/users", label: "Users", roles: ["ROLE_USER"] },
-        { href: "/products", label: "Products" }
+        {href: "/", label: "Home"},
+        {href: "/business", label: "Business", roles: ["ROLE_USER"]},
+        {href: "/products", label: "Products" }
+        {href: "/users", label: "Users", roles: ["ROLE_USER"]}
     ];
 
     return (
