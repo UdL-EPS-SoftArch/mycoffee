@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider"; // Assegura't que el tipus existeix
 import { Product, ProductEntity } from "@/types/product";
 
@@ -10,10 +10,10 @@ export class ProductService {
         // Ara utilitzem this.authProvider. Si l'usuari està loguejat, enviarà token.
         // Si no ho està, el provider retornarà null i serà una crida pública.
         const resource = await getHal("/products", this.authProvider);
-        
+
         const embedded = resource.embeddedArray("products");
         if (!embedded) return [];
-        
+
         return mergeHalArray<Product>(embedded);
     }
 
