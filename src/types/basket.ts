@@ -1,11 +1,11 @@
-import { Resource } from "halfred";
+import { Resource } from 'halfred';
 
 export interface BasketEntity {
     uri?: string;
-    id?: string;
-    customerUri: string; //TODO: change to Customer once its implemented
-    created?: Date;
-    updated?: Date;
+    id?: number;              // Long en backend → number en TS
+    customerId: number;       
+    createdAt?: string;       // ZonedDateTime → string ISO
+    updatedAt?: string;
 }
 
 export type Basket = BasketEntity & Resource;
