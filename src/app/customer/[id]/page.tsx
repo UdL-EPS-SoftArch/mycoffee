@@ -1,52 +1,53 @@
-import Link from "next/link";
-import {UsersService} from "@/api/userApi";
-import {serverAuthProvider} from "@/lib/authProvider";
-import {Record} from "@/types/record";
-import {RecordService} from "@/api/recordApi";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
 
-export default async function UsersPage(props: { params: Promise<{ id: string }> }) {
-    const userService = new UsersService(serverAuthProvider)
-    const recordService = new RecordService(serverAuthProvider)
-    const user = await userService.getUserById((await props.params).id);
-    let records: Record[] = [];
-    try {
-        records = await recordService.getRecordsByOwnedBy(user);
-    } catch (error) {
-        console.log(error);
-    }
+import { useEffect, useState } from 'react';
+import { Customer } from '@/types/customer';
+import { CustomerService } from '@/api/customerApi';
+import { clientAuthProvider } from '@/lib/authProvider';
+import { useParams, useRouter } from 'next/navigation';
+
+export default function CustomerDetailPage() {
+    const { id } = useParams();
+    const router = useRouter();
+    const authProvider = clientAuthProvider();
+
+    const [customer, setCustomer] = useState<Customer | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!id) return;
+
+        const service = new CustomerService(authProvider);
+
+        service.getCustomerById(id as string)
+            .then((c) => setCustomer(c))
+            .catch((err) => {
+                console.error(err);
+                setError('Customer not found');
+            })
+            .finally(() => setLoading(false));
+    }, [id, authProvider]);
+
+    if (loading) return <div className="p-6">Loading...</div>;
+    if (error) return <div className="p-6 text-red-600">{error}</div>;
+    if (!customer) return null;
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main
-                className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
-                    <div className="space-y-4 w-full">
-                        <h1 className="text-2xl font-semibold">{user.username}</h1>
+        <div className="p-6">
+            <button
+                className="px-3 py-1 bg-gray-300 rounded mb-4"
+                onClick={() => router.back()}
+            >
+                ← Back
+            </button>
 
-                        {user.email && (
-                            <p className="text-gray-700">
-                                <strong>Email:</strong> {user.email}
-                            </p>
-                        )}
+            <h1 className="text-2xl font-bold mb-2">{customer.name}</h1>
+            <p className="text-lg"> {customer.phoneNumber}</p>
 
-                        <h2 className="text-xl font-semibold mt-8">Records</h2>
-
-                        <div className="space-y-3 w-full">
-                            {records.map((record, i) => (
-                                <Card key={i} className="w-full">
-                                    <CardHeader>
-                                        <CardTitle><Link href={record.uri} className="hover:underline">
-                                            {record.name}
-                                        </Link></CardTitle>
-                                    </CardHeader>
-                                </Card>
-                            ))}
-                        </div>
-
-                    </div>
-                </div>
-            </main>
+            <div className="mt-4 text-sm text-gray-500">
+                <strong>URI:</strong> {customer.uri}
+            </div>
         </div>
     );
 }
