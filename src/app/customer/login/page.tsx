@@ -2,16 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CustomerEntity } from "@/types/customer";
-import Link from "next/link";
+import Link from "next/link"; // ← Agregar este import
 
-export default function RegisterCustomerPage() {
+export default function LoginCustomerPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState<Omit<CustomerEntity, 'uri'>>({
-        name: "",
+    const [formData, setFormData] = useState({
         email: "",
         password: "",
-        phoneNumber: "",
     });
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +27,7 @@ export default function RegisterCustomerPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("/api/customer/register", {
+            const response = await fetch("/api/customer/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -39,14 +36,12 @@ export default function RegisterCustomerPage() {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Registration failed");
+                throw new Error("Login failed");
             }
 
-            const data = await response.json();
-            router.push("/customer/login");
+            router.push("/customer");
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError("Invalid credentials");
         } finally {
             setIsLoading(false);
         }
@@ -55,7 +50,7 @@ export default function RegisterCustomerPage() {
     return (
         <div className="container mx-auto p-6">
             <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-                <h1 className="text-3xl font-bold mb-6 text-center">Register</h1>
+                <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -64,21 +59,6 @@ export default function RegisterCustomerPage() {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium mb-1">
-                            Name *
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium mb-1">
                             Email
@@ -89,35 +69,20 @@ export default function RegisterCustomerPage() {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
+                            required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium mb-1">
-                            Password *
+                            Password
                         </label>
                         <input
                             type="password"
                             id="password"
                             name="password"
                             value={formData.password}
-                            onChange={handleChange}
-                            required
-                            minLength={6}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="phoneNumber" className="block text-sm font-medium mb-1">
-                            Phone Number *
-                        </label>
-                        <input
-                            type="tel"
-                            id="phoneNumber"
-                            name="phoneNumber"
-                            value={formData.phoneNumber}
                             onChange={handleChange}
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -127,17 +92,17 @@ export default function RegisterCustomerPage() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition disabled:opacity-50"
                     >
-                        {isLoading ? "Registering..." : "Register"}
+                        {isLoading ? "Logging in..." : "Login"}
                     </button>
                 </form>
 
                 <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
-                        Already have an account?{" "}
-                        <Link href="/customer/login" className="text-blue-600 hover:underline">
-                            Login here
+                        Don&apos;t have an account?{" "}
+                        <Link href="/customer/register" className="text-blue-600 hover:underline">
+                            Register here
                         </Link>
                     </p>
                 </div>
