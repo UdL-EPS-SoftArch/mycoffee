@@ -6,7 +6,7 @@ import { CustomerEntity } from "@/types/customer";
 import { CustomerService } from "@/api/customerApi";
 import Link from "next/link";
 
-export default function RegisterCustomerPage() {
+export default function RegisterPage() {
     const router = useRouter();
     //admite cualquier dato, así no es necesario declarar el customer como DTO
     const [formData, setFormData] = useState<Omit<CustomerEntity, 'uri'>>({
@@ -32,7 +32,7 @@ export default function RegisterCustomerPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("/app/customer/register", {
+            const response = await fetch("/customer/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
