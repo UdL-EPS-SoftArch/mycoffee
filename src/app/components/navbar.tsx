@@ -14,6 +14,7 @@ export default function Navbar() {
         {href: "/", label: "Home"},
         {href: "/business", label: "Business", roles: ["ROLE_USER"]},
         {href: "/products", label: "Products" },
+        { href: "/baskets", label: "Baskets" },  
         {href: "/users", label: "Users", roles: ["ROLE_USER"]}
     ];
 
