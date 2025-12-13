@@ -1,53 +1,32 @@
-'use client';
+import { CustomerService } from "@/api/customerApi";
+import { serverAuthProvider } from "@/lib/authProvider";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { useEffect, useState } from 'react';
-import { Customer } from '@/types/customer';
-import { CustomerService } from '@/api/customerApi';
-import { clientAuthProvider } from '@/lib/authProvider';
-import { useParams, useRouter } from 'next/navigation';
-
-export default function CustomerDetailPage() {
-    const { id } = useParams();
-    const router = useRouter();
-    const authProvider = clientAuthProvider();
-
-    const [customer, setCustomer] = useState<Customer | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!id) return;
-
-        const service = new CustomerService(authProvider);
-
-        service.getCustomerById(id as string)
-            .then((c) => setCustomer(c))
-            .catch((err) => {
-                console.error(err);
-                setError('Customer not found');
-            })
-            .finally(() => setLoading(false));
-    }, [id, authProvider]);
-
-    if (loading) return <div className="p-6">Loading...</div>;
-    if (error) return <div className="p-6 text-red-600">{error}</div>;
-    if (!customer) return null;
+export default async function CustomerDetailPage({
+                                                     params
+                                                 }: {
+    params: { id: string }
+}) {
+    const service = new CustomerService(serverAuthProvider);
+    const customer = await service.getCustomerById(params.id);
 
     return (
-        <div className="p-6">
-            <button
-                className="px-3 py-1 bg-gray-300 rounded mb-4"
-                onClick={() => router.back()}
-            >
-                ← Back
-            </button>
-
-            <h1 className="text-2xl font-bold mb-2">{customer.name}</h1>
-            <p className="text-lg"> {customer.phoneNumber}</p>
-
-            <div className="mt-4 text-sm text-gray-500">
-                <strong>URI:</strong> {customer.uri}
-            </div>
+        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
+                    <Card className="w-full max-w-md">
+                        <CardHeader>
+                            <CardTitle>{customer.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500">Phone Number</p>
+                                <p className="text-lg">{customer.phoneNumber}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </main>
         </div>
     );
 }

@@ -14,7 +14,6 @@ import { clientAuthProvider } from "@/lib/authProvider";
 type FormValues = {
     name: string;
     phoneNumber: string;
-    email?: string;
 };
 
 export default function CustomerRegistrationPage() {
@@ -78,25 +77,6 @@ export default function CustomerRegistrationPage() {
                                     {errors.phoneNumber && (
                                         <p className="text-sm text-red-600 mt-1">
                                             {errors.phoneNumber.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="email">Email (optional)</Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        {...register("email", {
-                                            pattern: {
-                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                                message: "Invalid email",
-                                            },
-                                        })}
-                                    />
-                                    {errors.email && (
-                                        <p className="text-sm text-red-600 mt-1">
-                                            {errors.email.message}
                                         </p>
                                     )}
                                 </div>
