@@ -1,72 +1,44 @@
-'use client';
+import Link from "next/link";
+import { CustomerService } from "@/api/customerApi";
+import { serverAuthProvider } from "@/lib/authProvider";
+import { Button } from "@/components/ui/button";
 
-import { useState } from 'react';
-import { CustomerService } from '@/api/customerApi';
-import { clientAuthProvider } from '@/lib/authProvider';
-import { useRouter } from 'next/navigation';
-
-export default function RegisterCustomerPage() {
-    const router = useRouter();
-    const authProvider = clientAuthProvider();
-
-    const [name, setName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-
-        const service = new CustomerService(authProvider);
-
-        try {
-            await service.createCustomer({ name, phoneNumber });
-            router.push('/customer');
-        } catch (err) {
-            console.error(err);
-            setError('Error creating customer');
-        } finally {
-            setLoading(false);
-        }
-    };
+export default async function CustomersPage() {
+    const service = new CustomerService(serverAuthProvider);
+    const customers = await service.getCustomers();
 
     return (
-        <div className="p-6 max-w-md mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Register Customer</h1>
+        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
+                    <div className="flex justify-between items-center w-full">
+                        <h1 className="text-2xl font-semibold">Customers</h1>
+                        <Link href="/customer/register">
+                            <Button>Add Customer</Button>
+                        </Link>
+                    </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block mb-1 font-medium">Name</label>
-                    <input
-                        className="border p-2 w-full rounded"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
+                    <ul className="space-y-3 w-full">
+                        {customers.map((customer, i) => (
+                            <li
+                                key={i}
+                                className="p-4 w-full border rounded-lg bg-white shadow-sm hover:shadow transition dark:bg-black"
+                            >
+                                <Link
+                                    className="font-medium text-lg"
+                                    href={`/customer/${customer.uri?.split('/').pop()}`}
+                                >
+                                    {customer.name}
+                                </Link>
+
+                                <div className="text-gray-500 text-sm mt-1">
+                                    {customer.phoneNumber}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-
-                <div>
-                    <label className="block mb-1 font-medium">Phone Number</label>
-                    <input
-                        className="border p-2 w-full rounded"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        required
-                    />
-                </div>
-
-                {error && <p className="text-red-600">{error}</p>}
-
-                <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
-                    type="submit"
-                    disabled={loading}
-                >
-                    {loading ? 'Saving...' : 'Create Customer'}
-                </button>
-            </form>
+            </main>
         </div>
     );
 }
