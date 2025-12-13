@@ -1,32 +1,61 @@
 import { CustomerService } from "@/api/customerApi";
-import { serverAuthProvider } from "@/lib/authProvider";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { clientAuthProvider } from "@/lib/authProvider";
+import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export default async function CustomerDetailPage({
-                                                     params
+                                                     params,
                                                  }: {
-    params: { id: string }
+    params: { id: string };
 }) {
-    const service = new CustomerService(serverAuthProvider);
-    const customer = await service.getCustomerById(params.id);
+    const authProvider = await clientAuthProvider();
+    const customerService = new CustomerService(authProvider);
+
+    let customer;
+    try {
+        customer = await customerService.getCustomerById(params.id);
+    } catch (error) {
+        notFound();
+    }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
-                    <Card className="w-full max-w-md">
-                        <CardHeader>
-                            <CardTitle>{customer.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid gap-4">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500">Phone Number</p>
-                                <p className="text-lg">{customer.phoneNumber}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
+        <div className="container mx-auto p-6">
+            <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8">
+                <h1 className="text-3xl font-bold mb-6">Customer Details</h1>
+
+                <div className="space-y-4">
+                    <div className="border-b pb-4">
+                        <label className="text-sm font-medium text-gray-500">Name</label>
+                        <p className="text-lg">{customer.name}</p>
+                    </div>
+
+                    <div className="border-b pb-4">
+                        <label className="text-sm font-medium text-gray-500">Email</label>
+                        <p className="text-lg">{customer.email || 'N/A'}</p>
+                    </div>
+
+                    <div className="border-b pb-4">
+                        <label className="text-sm font-medium text-gray-500">Phone Number</label>
+                        <p className="text-lg">{customer.phoneNumber}</p>
+                    </div>
+
+                    {customer.uri && (
+                        <div className="border-b pb-4">
+                            <label className="text-sm font-medium text-gray-500">URI</label>
+                            <p className="text-sm text-gray-600 break-all">{customer.uri}</p>
+                        </div>
+                    )}
                 </div>
-            </main>
+
+                <div className="mt-8 flex gap-4">
+                    <Link
+                        href="/customer"
+                        className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition"
+                    >
+                        Back to List
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 }
