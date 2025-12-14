@@ -27,7 +27,7 @@ export default function LoginCustomerPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("/api/customer/login", {
+            const response = await fetch("/app/customer/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

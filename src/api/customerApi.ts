@@ -14,7 +14,7 @@ export class CustomerService {
 
     //  Acepta CustomerEntity en lugar de Customer
     async createCustomer(customer: Omit<CustomerEntity, 'uri'>): Promise<Customer> {
-        const resource = await postHal('/customers', customer as any, this.authProvider);
+        const resource = await postHal('/customers/register/', customer as any, this.authProvider);
         return mergeHal<Customer>(resource);
     }
 
