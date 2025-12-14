@@ -8,15 +8,19 @@ import Loginbar from "@/app/components/loginbar";
 
 export default function Navbar() {
     const pathname = usePathname();
-    const {user} = useAuth();
+    const { user } = useAuth();
 
     const navLinks = [
         {href: "/", label: "Home"},
-        // Aquí está el nuevo botón:
         {href: "/business", label: "Business", roles: ["ROLE_USER"]},
+
         {href: "/users", label: "Users", roles: ["ROLE_USER"]},
         {href: "/customer/register", label: "Register"},
         {href: "/customer", label: "Users", roles: ["ROLE_USER"]},
+
+        {href: "/products", label: "Products" },
+        {href: "/business", label: "Business", roles: ["ROLE_USER"]},
+     
     ];
 
     return (
@@ -35,10 +39,10 @@ export default function Navbar() {
 
                 <div className="flex gap-4">
                     {navLinks
-                        .filter(({roles}) =>
+                        .filter(({ roles }) =>
                             !roles || user?.authorities?.some(
                                 userAuth => roles.includes(userAuth.authority)))
-                        .map(({href, label}) => {
+                        .map(({ href, label }) => {
                             const active = pathname === href;
                             return (
                                 <Link
@@ -57,7 +61,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="ml-auto">
-                    <Loginbar/>
+                    <Loginbar />
                 </div>
 
             </div>

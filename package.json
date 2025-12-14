@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -20,7 +20,7 @@
     "cookies-next": "^6.1.1",
     "halfred": "^2.0.0",
     "lucide-react": "^0.554.0",
-    "next": "16.0.1",
+    "next": "16.0.8",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hook-form": "^7.66.1",
