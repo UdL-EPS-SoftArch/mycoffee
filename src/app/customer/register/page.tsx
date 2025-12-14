@@ -2,21 +2,26 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import { CustomerEntity } from "@/types/customer";
 import { CustomerService } from "@/api/customerApi";
-import Link from "next/link";
+import { clientAuthProvider } from "@/lib/authProvider";
 
 export default function RegisterPage() {
     const router = useRouter();
-    //admite cualquier dato, así no es necesario declarar el customer como DTO
-    const [formData, setFormData] = useState<Omit<CustomerEntity, 'uri'>>({
+
+    const [formData, setFormData] = useState<Omit<CustomerEntity, "uri">>({
         name: "",
         email: "",
         password: "",
         phoneNumber: "",
     });
+
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const service = new CustomerService(clientAuthProvider());
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -32,30 +37,25 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("/customer/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
+            // La API espera phoneNumber, se envía tal cual
+            const payload: Omit<CustomerEntity, "uri"> = {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                phoneNumber: formData.phoneNumber,
+            };
 
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(text);
-            }
-
-            // si el backend devuelve HTML, aquí puedes: redirigir
+            await service.createCustomer(payload);
             router.push("/customer");
-
-
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+        } catch (err: any) {
+            setError(
+                err?.message ??
+                "No se pudo registrar el cliente. Revisa los datos o intenta más tarde."
+            );
         } finally {
             setIsLoading(false);
         }
     };
-
 
     return (
         <div className="container mx-auto p-6">
@@ -99,7 +99,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium mb-1">
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-medium mb-1"
+                        >
                             Password *
                         </label>
                         <input
@@ -115,7 +118,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div>
-                        <label htmlFor="phoneNumber" className="block text-sm font-medium mb-1">
+                        <label
+                            htmlFor="phoneNumber"
+                            className="block text-sm font-medium mb-1"
+                        >
                             Phone Number *
                         </label>
                         <input
@@ -141,8 +147,11 @@ export default function RegisterPage() {
                 <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
                         Already have an account?{" "}
-                        <Link href="/customer/login" className="text-blue-600 hover:underline">
-                            Login here
+                        <Link
+                            href="/customer/login"
+                            className="text-blue-600 hover:underline"
+                        >
+                            Log in
                         </Link>
                     </p>
                 </div>
