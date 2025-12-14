@@ -8,7 +8,7 @@ import { SearchBar } from "@/app/components/searchBar";
 
 interface SimpleBasket {
   id: string;
-  customerId: number;
+  username: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -22,7 +22,7 @@ export default function BasketList({ initialBaskets }: BasketListProps) {
 
   const filteredBaskets = initialBaskets.filter((basket) =>
     basket.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    String(basket.customerId).includes(searchTerm)
+    String(basket.username).includes(searchTerm)
   );
 
   return (
@@ -43,7 +43,7 @@ export default function BasketList({ initialBaskets }: BasketListProps) {
                     Basket #{basket.id}
                   </CardTitle>
                   <span className="text-sm text-gray-500">
-                    Customer {basket.customerId}
+                    Customer {basket.username}
                   </span>
                 </div>
               </CardHeader>

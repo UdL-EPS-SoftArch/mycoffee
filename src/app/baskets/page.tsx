@@ -11,7 +11,7 @@ export default async function BasketsPage() {
 
   const cleanBaskets = baskets.map((basket) => ({
     id: basket.link("self")?.href.split("/").pop() || "#",
-    customerId: basket.customerId,
+    username: basket.username,
     createdAt: basket.createdAt,
     updatedAt: basket.updatedAt,
   }));

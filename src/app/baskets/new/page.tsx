@@ -2,37 +2,32 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BasketService } from "@/api/basketApi";
 import { clientAuthProvider } from "@/lib/authProvider";
 import { BasketEntity } from "@/types/basket";
+import { useAuth } from "@/app/components/authentication";
 
-type BasketFormData = {
-  customerId: number;
-};
 
 export default function NewBasketPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const user = useAuth().user;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<BasketFormData>();
-
-  const onSubmit = async (data: BasketFormData) => {
+  const onSubmit = async () => {
+    if (!user) {
+      setError("You must be logged in to create a basket.");
+      return;
+    }
+    
     setIsSubmitting(true);
     setError(null);
 
     try {
       const basketData: BasketEntity = {
-        customerId: Number(data.customerId),
+        username: user.username,
       };
 
       const basketService = new BasketService(clientAuthProvider());
@@ -62,48 +57,29 @@ export default function NewBasketPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded break-words text-sm">
-                  {error}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="customerId">
-                  Customer ID <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="customerId"
-                  type="number"
-                  {...register("customerId", {
-                    required: "Customer ID is required",
-                    min: { value: 1, message: "Customer ID must be positive" },
-                  })}
-                  placeholder="1"
-                />
-                {errors.customerId && (
-                  <p className="text-sm text-red-500">
-                    {errors.customerId.message}
-                  </p>
-                )}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded break-words text-sm">
+                {error}
               </div>
+            )}
+            <Button
+              onClick={onSubmit}
+              disabled={isSubmitting || !user}
+              className="w-full mt-4"
+            >
+              {isSubmitting ? "Creating..." : "Create Basket for current user"}
+            </Button>
 
-              <div className="flex gap-4 pt-4">
-                <Button type="submit" disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? "Creating..." : "Create Basket"}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.back()}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
+            <div className="mt-4 flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
