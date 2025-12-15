@@ -13,6 +13,7 @@ export default function RegisterPage() {
 
     const [formData, setFormData] = useState<Omit<CustomerEntity, "uri">>({
         name: "",
+        username: "",
         email: "",
         password: "",
         phoneNumber: "",
@@ -40,6 +41,7 @@ export default function RegisterPage() {
             // La API espera phoneNumber, se envía tal cual
             const payload: Omit<CustomerEntity, "uri"> = {
                 name: formData.name,
+                username: formData.username,
                 email: formData.email,
                 password: formData.password,
                 phoneNumber: formData.phoneNumber,
@@ -78,6 +80,21 @@ export default function RegisterPage() {
                             id="name"
                             name="name"
                             value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="username" className="block text-sm font-medium mb-1">
+                            Username *
+                        </label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
                             onChange={handleChange}
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

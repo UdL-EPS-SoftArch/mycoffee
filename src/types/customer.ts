@@ -1,12 +1,9 @@
 import { Resource } from "halfred";
+import { UserEntity } from '@/types/user';
 
-export interface CustomerEntity {
-    uri?: string;
+export interface CustomerEntity extends UserEntity {
     name: string;
-    email?: string;
-    password?: string
     phoneNumber: string;
-
 }
 
 export type Customer = CustomerEntity & Resource;
