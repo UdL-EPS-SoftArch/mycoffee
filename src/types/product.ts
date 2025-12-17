@@ -9,6 +9,12 @@ export interface ProductEntity {
     size?: string;
     barcode?: string;
 
+    category?: {
+        name: string;
+    };
+
+    categoryName?: string;
+
     // Estados
     available?: boolean;
     partOfLoyaltyProgram?: boolean;

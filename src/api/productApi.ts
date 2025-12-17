@@ -7,15 +7,15 @@ export class ProductService {
     }
 
     async getProducts(): Promise<Product[]> {
-        // Ara utilitzem this.authProvider. Si l'usuari està loguejat, enviarà token.
-        // Si no ho està, el provider retornarà null i serà una crida pública.
-        const resource = await getHal("/products", this.authProvider);
+        // Crida 'productSummary' projection per obtenir només els camps necessaris
+        const resource = await getHal("/products?projection=productSummary", this.authProvider);
         
         const embedded = resource.embeddedArray("products");
         if (!embedded) return [];
         
         return mergeHalArray<Product>(embedded);
     }
+
 
     async getProductById(id: string): Promise<Product> {
         const resource = await getHal(`/products/${id}`, this.authProvider);
