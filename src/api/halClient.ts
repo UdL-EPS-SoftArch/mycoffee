@@ -41,4 +41,5 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
         throw new Error(`HTTP ${res.status} posting ${JSON.stringify(body)}`)
     }
     return halfred.parse(await res.json());
+
 }
