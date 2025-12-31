@@ -28,18 +28,24 @@ export async function getHal(path: string, authProvider: { getAuth: () => Promis
 export async function postHal(path: string, body: Resource, authProvider: { getAuth: () => Promise<string | null> }) {
     const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
     const authorization = await authProvider.getAuth();
+    
     const res = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/hal+json",
-            ...(authorization ? { Authorization: authorization } : {}), },
+            ...(authorization ? { Authorization: authorization } : {}), 
+        },
         body: JSON.stringify(body),
         cache: "no-store",
     });
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status} posting ${JSON.stringify(body)}`)
-    }
-    return halfred.parse(await res.json());
 
+    // --- CORRECCIÓ: Llegim el missatge d'error del backend ---
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("❌ BACKEND ERROR:", errorText); // Mira la consola del navegador!
+        throw new Error(`HTTP ${res.status} posting. Details: ${errorText}`);
+    }
+    
+    return halfred.parse(await res.json());
 }
