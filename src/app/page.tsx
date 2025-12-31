@@ -6,15 +6,15 @@ export default function Home() {
         <div className="min-h-screen bg-stone-50 text-stone-900 font-sans">
             <main className="flex flex-col min-h-screen">
 
-                {/* 1. Secció Hero (Portada) */}
+                {/* 1. Hero Section */}
                 <Hero />
 
-                {/* 2. Secció Features (Informació) */}
+                {/* 2. Features Section */}
                 <Features />
 
-                {/* 3. Un petit footer ràpid (es pot moure a un component després) */}
+                {/* 3. Simple Footer */}
                 <footer className="bg-stone-900 text-stone-400 py-8 text-center text-sm">
-                    <p>© 2024 La Meva Cafeteria. Fet amb molt de ☕ i codi.</p>
+                    <p>© 2025 My Coffee Shop. Made with lots of ☕ and code.</p>
                 </footer>
 
             </main>
