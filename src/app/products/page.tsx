@@ -28,8 +28,7 @@ export default async function ProductsPage() {
         description: product.description,
         stock: product.stock,
         available: product.available,
-        // Aquí s'assigna el valor. TypeScript ara estarà content perquè ProductList ho espera.
-        categoryName: product.categoryName || product.category?.name || "General"
+        categoryName: product.categoryName || product.category?.name || "General",
     }));
 
     return (

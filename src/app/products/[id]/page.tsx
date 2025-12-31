@@ -1,25 +1,33 @@
 import Link from "next/link";
-// 1. Canviem l'import per la Classe, ja que getProductById ara és un mètode d'aquesta classe
 import { ProductService } from "@/api/productApi";
+import { UsersService } from "@/api/userApi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faStar, faLeaf, faExclamationTriangle, faBarcode, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { ProductImage } from "./ProductImage";
+import { ImageUpload } from "./ImageUpload";
+import { serverAuthProvider } from "@/lib/authProvider";
+
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
 
 export default async function ProductDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
 
-    // 2. Instanciem el servei. 
-    // Com que estem en un Server Component (SSR), no tenim accés al localStorage del navegador.
-    // Passem un proveïdor que retorna null, assumint que veure un producte és públic.
-    const productService = new ProductService({ 
-        getAuth: async () => null 
+    const productService = new ProductService({
+        getAuth: async () => null
     });
+    const usersService = new UsersService(serverAuthProvider);
 
-    // 3. Cridem al mètode de la instància
-    const product = await productService.getProductById(params.id);
+    const [product, currentUser] = await Promise.all([
+        productService.getProductById(params.id),
+        usersService.getCurrentUser().catch(() => null)
+    ]);
 
-    // Detectamos si hay alérgenos para cambiar el estilo de la tarjeta
+    const isAdmin = currentUser?.authorities?.some(
+        auth => auth.authority === "ROLE_ADMIN"
+    );
+
     const hasAllergens = product.allergens && product.allergens.length > 0;
 
     return (
@@ -37,6 +45,19 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
 
                     {/* COLUMNA IZQUIERDA (2/3): Información Principal */}
                     <div className="lg:col-span-2 space-y-6">
+
+                        {/* PRODUCT IMAGE - carrega des de l'endpoint /products/{id}/image */}
+                        <div className="relative w-full h-64 md:h-80 lg:h-96 bg-gray-100 dark:bg-zinc-800 rounded-xl overflow-hidden">
+                            <ProductImage
+                                src={`${API_BASE_URL}/products/${params.id}/image`}
+                                alt={product.name}
+                            />
+                        </div>
+
+                        {/* Image Upload (només per admins) */}
+                        {isAdmin && (
+                            <ImageUpload productId={params.id} />
+                        )}
 
                         {/* CABECERA DE PRODUCTO */}
                         <div className="flex justify-between items-center gap-4">
