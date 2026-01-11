@@ -1,7 +1,7 @@
 import { Resource } from "halfred";
+import { UserEntity } from '@/types/user';
 
-export interface CustomerEntity {
-    uri?: string;
+export interface CustomerEntity extends UserEntity {
     name: string;
     phoneNumber: string;
 }

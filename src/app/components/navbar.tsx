@@ -12,10 +12,16 @@ export default function Navbar() {
 
     const navLinks = [
         { href: "/", label: "Home" },
+        { href: "/products", label: "Products" },
+        { href: "/categories", label: "Categories" },
+        { href: "/baskets", label: "Baskets" },
         { href: "/business", label: "Business", roles: ["ROLE_USER"] },
         { href: "/inventory", label: "Inventory", roles: ["ROLE_BUSINESS"] },
-        { href: "/products", label: "Products" },
         { href: "/users", label: "Users", roles: ["ROLE_USER"] },
+        { href: "/customer/register", label: "Register" },
+        { href: "/customer", label: "Users", roles: ["ROLE_USER"] },
+        { href: "/customer/login", label: "Users", roles: ["ROLE_USER"] },
+
     ];
 
     return (
@@ -34,10 +40,10 @@ export default function Navbar() {
 
                 <div className="flex gap-4">
                     {navLinks
-                        .filter(({roles}) =>
+                        .filter(({ roles }) =>
                             !roles || user?.authorities?.some(
                                 userAuth => roles.includes(userAuth.authority)))
-                        .map(({href, label}) => {
+                        .map(({ href, label }) => {
                             const active = pathname === href;
                             return (
                                 <Link
@@ -56,7 +62,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="ml-auto">
-                    <Loginbar/>
+                    <Loginbar />
                 </div>
 
             </div>

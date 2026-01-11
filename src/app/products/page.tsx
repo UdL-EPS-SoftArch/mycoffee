@@ -1,20 +1,26 @@
 import { ProductService } from "@/api/productApi";
+import { UsersService } from "@/api/userApi";
 import ProductList from "@/app/components/ProductList";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react"; 
-// Importa el teu provider directament, no cal importar 'cookies' aquí
 import { serverAuthProvider } from "@/lib/authProvider"; 
 
 export default async function ProductsPage() {
     
-    // 1. Instanciem el servei utilitzant el serverAuthProvider que ja tens definit
-    // (Aquest ja gestiona el 'await cookies()' internament correctament)
     const productService = new ProductService(serverAuthProvider);
+    const usersService = new UsersService(serverAuthProvider); 
 
-    // 2. Cridem al backend
-    const products = await productService.getProducts();
+    const [products, currentUser] = await Promise.all([
+        productService.getProducts(),
+        usersService.getCurrentUser()
+    ]);
 
+    const isAdmin = currentUser?.authorities?.some(
+        auth => auth.authority === "ROLE_ADMIN"
+    );
+
+    // Mapeig de dades (incloent categoryName)
     const cleanProducts = products.map((product) => ({
         id: product.link("self")?.href.split("/").pop() || "#",
         name: product.name,
@@ -22,6 +28,7 @@ export default async function ProductsPage() {
         description: product.description,
         stock: product.stock,
         available: product.available,
+        categoryName: product.categoryName || product.category?.name || "General",
     }));
 
     return (
@@ -29,12 +36,15 @@ export default async function ProductsPage() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold">Our Coffee Products</h1>
-                    <Button asChild>
-                        <Link href="/products/new">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create Product
-                        </Link>
-                    </Button>
+                    
+                    {isAdmin && (
+                        <Button asChild>
+                            <Link href="/products/new">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Product
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 {cleanProducts.length === 0 ? (
@@ -47,6 +57,7 @@ export default async function ProductsPage() {
                         </p>
                     </div>
                 ) : (
+                    /* He tret el comentari d'aquí per evitar l'error de sintaxi JSX */
                     <ProductList initialProducts={cleanProducts} />
                 )}
             </div>
