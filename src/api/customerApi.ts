@@ -1,6 +1,6 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider";
-import {Customer, CustomerEntity} from "@/types/customer";
+import { Customer, CustomerEntity } from "@/types/customer";
 
 export class CustomerService {
     constructor(private readonly authProvider: AuthProvider) {
@@ -23,8 +23,7 @@ export class CustomerService {
         return mergeHal<Customer>(resource);
     }
 
-    async getCustomerRelation<T>(customer: Customer, relation: string): Promise<T>
-    {
+    async getCustomerRelation<T>(customer: Customer, relation: string): Promise<T> {
         const link = customer.link(relation);
         if (!link?.href) {
             throw new Error(`Relación '${relation}' no encontrada en Customer`);
@@ -32,5 +31,4 @@ export class CustomerService {
         const resource = await getHal(link.href, this.authProvider);
         return mergeHal<T>(resource);
     }
-
 }

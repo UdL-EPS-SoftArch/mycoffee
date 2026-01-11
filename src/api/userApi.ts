@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal } from '@/lib/halClient';
 import type { AuthProvider } from "@/lib/authProvider";
 import { User } from "@/types/user";
 
