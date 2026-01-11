@@ -6,4 +6,8 @@ export interface Inventory extends Resource {
     description?: string;
     location: string;
     totalStock: number;
+    capacity?: number;
+    type?: 'WAREHOUSE' | 'SHELF' | 'FRIDGE' | 'DISPLAY' | 'BACKROOM';
+    status?: 'ACTIVE' | 'FULL' | 'MAINTENANCE' | 'CLOSED';
+    lastUpdated?: string;
 }

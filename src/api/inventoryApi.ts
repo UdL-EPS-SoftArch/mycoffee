@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "@/lib/halClient";
+import { getHal, mergeHal, mergeHalArray, postHal, patchHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { Inventory } from "@/types/inventory";
 import { User } from "@/types/user";
@@ -28,6 +28,14 @@ export class InventoryService {
 
     async createInventory(inventory: Partial<Inventory>): Promise<Inventory> {
         const resource = await postHal('/inventories', inventory as any, this.authProvider);
+        return mergeHal<Inventory>(resource);
+    }
+
+    async updateInventory(inventory: Inventory, data: Partial<Inventory>): Promise<Inventory> {
+        const url = inventory.link('self')?.href;
+        if (!url) throw new Error("No update URL found for inventory");
+
+        const resource = await patchHal(url, data, this.authProvider);
         return mergeHal<Inventory>(resource);
     }
 

@@ -1,4 +1,4 @@
-import halfred, {Resource} from "halfred";
+import halfred, { Resource } from "halfred";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
@@ -16,7 +16,8 @@ export async function getHal(path: string, authProvider: { getAuth: () => Promis
     const res = await fetch(url, {
         headers: {
             "Accept": "application/hal+json",
-            ...(authorization ? { Authorization: authorization } : {}), },
+            ...(authorization ? { Authorization: authorization } : {}),
+        },
         cache: "no-store",
     });
     if (!res.ok) {
@@ -33,7 +34,8 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/hal+json",
-            ...(authorization ? { Authorization: authorization } : {}), },
+            ...(authorization ? { Authorization: authorization } : {}),
+        },
         body: JSON.stringify(body),
         cache: "no-store",
     });
@@ -41,4 +43,25 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
         throw new Error(`HTTP ${res.status} posting ${JSON.stringify(body)}`)
     }
     return halfred.parse(await res.json());
+}
+
+export async function patchHal(path: string, body: any, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+    const res = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/hal+json",
+            ...(authorization ? { Authorization: authorization } : {}),
+        },
+        body: JSON.stringify(body),
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`HTTP ${res.status}: ${errText || res.statusText}`);
+    }
+    const text = await res.text();
+    return text ? halfred.parse(JSON.parse(text)) : {} as any;
 }
