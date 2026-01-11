@@ -75,7 +75,7 @@ export default function InventoryPage() {
 
         setInventories(inventories.map(i =>
             i._links?.self?.href === itemUrl
-                ? Object.assign(i, { totalStock: newStock, lastUpdated: new Date().toISOString() })
+                ? Object.assign(Object.create(Object.getPrototypeOf(i)), i, { totalStock: newStock, lastUpdated: new Date().toISOString() })
                 : i
         ));
 
