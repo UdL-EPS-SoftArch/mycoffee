@@ -3,19 +3,11 @@
 import Link from "next/link";
 import { useAuth } from "@/app/components/authentication";
 
-// --- BOTÓN DE CREAR ---
-// (Opcional: decide si un dueño de negocio puede crear más o no)
 export function CreateBusinessButton() {
-    // 👇 SIMULACIÓN: Usuario "juan_cafes" con rol de negocio
-    const user = {
-        username: "juan_cafes",
-        authorities: [{ authority: "ROLE_BUSINESS" }]
-    };
+    const { user } = useAuth();
 
-    // Aquí puedes decidir: ¿Solo ADMIN crea? ¿O BUSINESS también?
-    // Si quieres que el Business pueda crear, añade "ROLE_BUSINESS" al array.
     const canCreate = user?.authorities?.some(
-        a => ["ROLE_ADMIN", "ROLE_BUSINESS"].includes(a.authority)
+        a => ["ROLE_ADMIN"].includes(a.authority)
     );
 
     if (!canCreate) return null;
@@ -36,26 +28,14 @@ interface BusinessActionsProps {
     ownerId: string;
 }
 
-// --- BOTONES DE ACCIÓN (EDITAR/BORRAR) ---
+
 export function BusinessActions({ id, ownerId }: BusinessActionsProps) {
-    // 👇 SIMULACIÓN: Estamos logueados como JUAN
-    const user = {
-        username: "juan_cafes",
-        authorities: [{ authority: "ROLE_BUSINESS" }]
-    };
+    const { user } = useAuth();
 
-    // 1. ¿Es ADMIN? (El Admin siempre puede todo)
     const isAdmin = user?.authorities?.some(a => a.authority === "ROLE_ADMIN");
-
-    // 2. ¿Tiene ROL DE NEGOCIO?
     const hasBusinessRole = user?.authorities?.some(a => a.authority === "ROLE_BUSINESS");
-
-    // 3. ¿Es SU negocio? (Coincide el usuario logueado con el dueño del negocio)
-    // Nota: Asegúrate que tu objeto user real tenga la propiedad 'username' o 'id'
     const isOwner = user?.username === ownerId;
 
-    // LÓGICA FINAL:
-    // Puede editar si es Admin O (si tiene rol de negocio Y es el dueño)
     const canEdit = isAdmin || (hasBusinessRole && isOwner);
 
     if (!canEdit) return null;
