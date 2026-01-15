@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; // ← Agregar este import
+import Link from "next/link";
 
 export default function LoginCustomerPage() {
     const router = useRouter();
@@ -27,21 +27,24 @@ export default function LoginCustomerPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("/app/customer/login", {
-                method: "POST",
+            // 1) PRIMERO: probar login con Basic Auth en cualquier endpoint protegido
+            const response = await fetch("http://localhost:8080/customers", {
                 headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
+                    "Accept": "application/hal+json",
+                    "Authorization": `Basic ${btoa(`${formData.email}:${formData.password}`)}`
+                }
             });
 
-            if (!response.ok) {
-                throw new Error("Login failed");
+            if (response.ok) {
+                // 2) Login OK → guardar credenciales
+                localStorage.setItem("MYCOFFEE_AUTH", `${formData.email}:${formData.password}`);
+                router.push("/customer");
+            } else {
+                throw new Error("Invalid email or password");
             }
-
-            router.push("/customer");
         } catch (err) {
-            setError("Invalid credentials");
+            setError("Invalid email or password");
+            localStorage.removeItem("MYCOFFEE_AUTH");
         } finally {
             setIsLoading(false);
         }
@@ -61,7 +64,7 @@ export default function LoginCustomerPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium mb-1">
-                            Email
+                            Email *
                         </label>
                         <input
                             type="email"
@@ -76,7 +79,7 @@ export default function LoginCustomerPage() {
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium mb-1">
-                            Password
+                            Password *
                         </label>
                         <input
                             type="password"
@@ -85,6 +88,7 @@ export default function LoginCustomerPage() {
                             value={formData.password}
                             onChange={handleChange}
                             required
+                            minLength={6}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -100,7 +104,7 @@ export default function LoginCustomerPage() {
 
                 <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
-                        Don&apos;t have an account?{" "}
+                        Don't have an account?{" "}
                         <Link href="/customer/register" className="text-blue-600 hover:underline">
                             Register here
                         </Link>
