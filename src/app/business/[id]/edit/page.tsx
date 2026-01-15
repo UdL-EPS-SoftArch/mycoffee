@@ -18,6 +18,9 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     const [formData, setFormData] = useState<Partial<BusinessEntity>>({
         name: "",
         address: "",
@@ -43,8 +46,11 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
                     capacity: business.capacity,
                     hasWifi: business.hasWifi,
                     email: business.email,
-                    username: business.username
+                    username: business.username,
+                    imageUrl: business.imageUrl
                 });
+
+                if (business.imageUrl) setPreviewUrl(business.imageUrl);
             } catch (err: any) {
                 console.error("Failed to load business", err);
                 setError("Failed to load business details.");
@@ -68,6 +74,14 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
@@ -78,17 +92,29 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
             const service = new BusinessService(authProvider);
 
             const payload = { ...formData };
-
             if (payload.openingTime && payload.openingTime.length === 5) {
                 payload.openingTime = `${payload.openingTime}:00`;
             }
             if (payload.closingTime && payload.closingTime.length === 5) {
                 payload.closingTime = `${payload.closingTime}:00`;
             }
-
             if (!payload.password) delete payload.password;
 
+            if (selectedFile) {
+                const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = error => reject(error);
+                });
+
+                const base64Full = await toBase64(selectedFile);
+                const base64Content = base64Full.split(',')[1];
+
+                payload.image = base64Content;
+            }
             await service.updateBusiness(id, payload);
+
             router.push("/business");
             router.refresh();
         } catch (err: any) {
@@ -118,6 +144,39 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="mb-8">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Cafe Image
+                            </label>
+                            <div className="flex items-center gap-6">
+                                <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 flex-shrink-0">
+                                    {previewUrl ? (
+                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="flex items-center justify-center w-full h-full text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-black file:text-white
+                                            hover:file:bg-zinc-800
+                                            dark:file:bg-zinc-800 dark:file:text-gray-300
+                                        "
+                                    />
+                                    <p className="mt-2 text-xs text-gray-500">JPG, PNG or WEBP up to 5MB.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Cafe Name

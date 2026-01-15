@@ -11,6 +11,7 @@ export interface BusinessEntity extends UserEntity {
     capacity?: number;
     ownerId?: string;
     imageUrl?: string;
+    image?: string;
     openingTime?: string;
     closingTime?: string;
 }

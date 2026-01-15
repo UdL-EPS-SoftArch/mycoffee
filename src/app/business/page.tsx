@@ -52,9 +52,17 @@ export default function CafeteriasPage() {
                             className="group relative flex flex-col justify-between border border-gray-200 rounded-2xl bg-white p-0 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300 dark:bg-black dark:border-zinc-800 overflow-hidden"
                         >
                             <div className="h-48 bg-zinc-200 dark:bg-zinc-800 relative overflow-hidden">
-                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 dark:text-zinc-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 0 0 1-4 4H6a4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
-                                </div>
+                                {cafe.imageUrl ? (
+                                    <img
+                                        src={cafe.imageUrl}
+                                        alt={cafe.name}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-zinc-400 dark:text-zinc-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 0 0 1-4 4H6a4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="p-6 pb-2">
