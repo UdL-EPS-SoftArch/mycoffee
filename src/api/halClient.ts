@@ -73,3 +73,25 @@ export async function patchHal(path: string, body: any, authProvider: { getAuth:
 
     return halfred.parse(await res.json());
 }
+
+export async function deleteHal(path: string, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+
+    const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Accept": "application/hal+json",
+            ...(authorization ? { Authorization: authorization } : {}),
+        },
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("BACKEND ERROR:", errorText);
+        throw new Error(`HTTP ${res.status} deleting. Details: ${errorText}`);
+    }
+    if (res.status === 204) return null;
+    return halfred.parse(await res.json());
+}
