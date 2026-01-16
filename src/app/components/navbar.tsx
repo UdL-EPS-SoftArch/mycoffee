@@ -19,7 +19,7 @@ export default function Navbar() {
         { href: "/users", label: "Users", roles: ["ROLE_USER"] },
         { href: "/customer/register", label: "Register" },
         { href: "/customer", label: "Users", roles: ["ROLE_USER"] },
-        { href: "/customer/login", label: "Users", roles: ["ROLE_USER"] },
+        { href: "/customer/login", label: "Login", roles: ["ROLE_USER"] },
     ];
 
     return (

@@ -107,7 +107,7 @@ export default function CustomerDashboard() {
                     </Link>
 
                     {/* Productos */}
-                    <Link href="/products/page" className="group">
+                    <Link href="/products" className="group">
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border-2 border-transparent hover:border-green-200 hover:-translate-y-2">
                             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-2xl mx-auto mb-6 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors flex items-center justify-center">
                                 <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +127,7 @@ export default function CustomerDashboard() {
                     </Link>
 
                     {/* Negocios */}
-                    <Link href="/business/page" className="group">
+                    <Link href="/business" className="group">
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border-2 border-transparent hover:border-purple-200 hover:-translate-y-2">
                             <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/50 rounded-2xl mx-auto mb-6 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors flex items-center justify-center">
                                 <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

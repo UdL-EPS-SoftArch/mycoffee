@@ -63,7 +63,7 @@ export default function Loginbar() {
 
     return (
         <div className="flex items-center gap-2">
-            <Link href="/login"
+            <Link href="customer/login"
                   className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"> Login </Link>
             <Link href="/customer/register"
                   className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"> Register </Link>

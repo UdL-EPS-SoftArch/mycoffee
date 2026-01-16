@@ -28,7 +28,7 @@ export default function LoginCustomerPage() {
 
         try {
             // 1) PRIMERO: probar login con Basic Auth en cualquier endpoint protegido
-            const response = await fetch("http://localhost:8080/customers", {
+            const response = await fetch("http://localhost:8080/identity", {
                 headers: {
                     "Accept": "application/hal+json",
                     "Authorization": `Basic ${btoa(`${formData.email}:${formData.password}`)}`
