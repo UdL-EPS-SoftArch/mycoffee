@@ -14,7 +14,7 @@ export default function Home() {
 
                 {/* 3. Simple Footer */}
                 <footer className="bg-stone-900 text-stone-400 py-8 text-center text-sm">
-                    <p>© 2025 My Coffee Shop. Made with lots of ☕ and code.</p>
+                    <p>© 2026 My Coffee Shop. Made with lots of ☕ and code.</p>
                 </footer>
 
             </main>
