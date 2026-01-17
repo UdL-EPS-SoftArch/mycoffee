@@ -1,42 +1,95 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { BasketItemService } from "@/api/basketItemApi";
+import { clientAuthProvider } from "@/lib/authProvider";
+import { Button } from "@/components/ui/button";
+
 interface MyBasketProps {
   basketId: string;
 }
 
+interface BasketItemDisplay {
+  id: number;
+  productName: string;
+  productPrice: number;
+  quantity: number;
+}
+
 export default function MyBasket({ basketId }: MyBasketProps) {
+  const [items, setItems] = useState<BasketItemDisplay[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const basketItemService = new BasketItemService(clientAuthProvider());
+        const rawItems = await basketItemService.getItemsByBasket(basketId);
+        
+        // TODO: fetch product details for each item
+        const displayItems = rawItems.map((item: any) => ({
+          id: item.id,
+          productName: "Product", // Fetch from item.product URI
+          productPrice: 4.5,       // Fetch from product
+          quantity: item.quantity || 1,
+        }));
+        
+        setItems(displayItems);
+      } catch (error) {
+        console.error("Error fetching basket items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, [basketId]);
+
+  const total = items.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
+
+  if (loading) return <div className="text-center py-12">Loading your basket...</div>;
+
   return (
     <div className="max-w-2xl mx-auto py-12 px-6">
-      <h1 className="text-3xl font-bold mb-8">🛒 My Basket (ID: {basketId})</h1>
+      <h1 className="text-3xl font-bold mb-8">🛒 My Basket</h1>
       
-      <div className="bg-gray-50 p-6 rounded-lg mb-8">
-        <div className="flex justify-between items-center p-4 border-b">
-          <div>
-            <h3 className="font-semibold">Cappuccino</h3>
-            <p className="text-sm text-gray-500">$4.00 each</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button className="w-10 h-10 border rounded-full flex items-center justify-center hover:bg-gray-200">-</button>
-            <span className="w-12 text-center font-semibold">2</span>
-            <button className="w-10 h-10 border rounded-full flex items-center justify-center hover:bg-gray-200">+</button>
-            <button className="ml-4 text-red-500 hover:text-red-700">🗑️ Remove</button>
-            <span className="font-bold text-lg ml-4">$8.00</span>
-          </div>
+      {items.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500 mb-4">Your basket is empty</p>
+          <a href="/products" className="text-blue-600 hover:underline">
+            Continue Shopping →
+          </a>
         </div>
-      </div>
-      
-      <div className="text-right mb-8 p-4 bg-gray-50 rounded-lg">
-        <div className="text-2xl font-bold text-green-600">Total: $12.50</div>
-      </div>
-      
-      <div className="flex gap-4 justify-end">
-        <button className="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
-          Continue Shopping
-        </button>
-        <button className="px-10 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold shadow-lg">
-          Proceed to Checkout →
-        </button>
-      </div>
+      ) : (
+        <>
+          <div className="space-y-4 mb-8">
+            {items.map((item) => (
+              <div key={item.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h3 className="font-semibold">{item.productName}</h3>
+                  <p className="text-sm text-gray-500">${item.productPrice.toFixed(2)} each</p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className="font-semibold">x{item.quantity}</span>
+                  <span className="font-bold">${(item.productPrice * item.quantity).toFixed(2)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-right mb-8 p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">
+              Total: ${total.toFixed(2)}
+            </div>
+          </div>
+          
+          <div className="flex gap-4 justify-end">
+            <Button variant="outline" asChild>
+              <a href="/products">Continue Shopping</a>
+            </Button>
+            <Button size="lg">Proceed to Checkout →</Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
