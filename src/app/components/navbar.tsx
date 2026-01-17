@@ -15,11 +15,13 @@ export default function Navbar() {
         { href: "/products", label: "Products" },
         { href: "/categories", label: "Categories" },
         { href: "/baskets", label: "Baskets" },
-        { href: "/business", label: "Business" },
+        { href: "/business", label: "Business", roles: ["ROLE_USER"] },
+        { href: "/inventory", label: "Inventory", roles: ["ROLE_BUSINESS"] },
         { href: "/users", label: "Users", roles: ["ROLE_USER"] },
         { href: "/customer/register", label: "Register" },
         { href: "/customer", label: "Users", roles: ["ROLE_USER"] },
         { href: "/customer/login", label: "Users", roles: ["ROLE_USER"] },
+
     ];
 
     return (

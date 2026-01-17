@@ -9,11 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductService } from "@/api/productApi";
 import { CategoryService } from "@/api/categoryApi";
-import { InventoryService } from "@/api/inventoryApi"; // <--- IMPORT NOU
+import { InventoryService } from "@/api/inventoryApi";
 import { clientAuthProvider } from "@/lib/authProvider";
 import { ProductEntity } from "@/types/product";
 import { Category } from "@/types/category";
-import { Inventory } from "@/api/inventoryApi"; // <--- IMPORT NOU
+import { Inventory } from "@/types/inventory";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
@@ -25,7 +25,7 @@ type ProductFormData = {
   brand?: string;
   size?: string;
   barcode?: string;
-  
+
   category?: string;
   inventory: string; // <--- NOU CAMP OBLIGATORI
 
@@ -49,7 +49,7 @@ export default function NewProductPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Estats per les llistes desplegables
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [inventories, setInventories] = useState<{ id: string; name: string }[]>([]);
@@ -72,12 +72,12 @@ export default function NewProductPage() {
       try {
         const auth = clientAuthProvider();
         const categoryService = new CategoryService(auth);
-        const inventoryService = new InventoryService(auth); // <--- Servei nou
+        const inventoryService = new InventoryService(auth);
 
         // Fem les dues peticions en paral·lel
         const [fetchedCategories, fetchedInventories] = await Promise.all([
             categoryService.getCategories(),
-            inventoryService.getInventories()
+            inventoryService.getAllInventories()
         ]);
 
         // Processar categories
@@ -136,10 +136,10 @@ export default function NewProductPage() {
       // --- CONSTRUCCIÓ DEL PAYLOAD AMB ENLLAÇOS ---
       const productPayload = {
         ...productData,
-        
+
         // Enllaç a Categoria (URL Absoluta)
-        ...(data.category && data.category !== "" 
-            ? { category: `${API_BASE_URL}/categories/${data.category}` } 
+        ...(data.category && data.category !== ""
+            ? { category: `${API_BASE_URL}/categories/${data.category}` }
             : {}),
 
         // Enllaç a Inventari (URL Absoluta) - OBLIGATORI
@@ -150,7 +150,7 @@ export default function NewProductPage() {
 
       const productService = new ProductService(clientAuthProvider());
       await productService.createProduct(productPayload as ProductEntity);
-      
+
       router.push("/products");
       router.refresh();
     } catch (err) {
@@ -172,7 +172,7 @@ export default function NewProductPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              
+
               {/* Error Display */}
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded break-words text-sm">

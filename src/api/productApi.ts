@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider"; // Assegura't que el tipus existeix
 import { Product, ProductEntity } from "@/types/product";
 
@@ -9,10 +9,10 @@ export class ProductService {
     async getProducts(): Promise<Product[]> {
         // Crida 'productSummary' projection per obtenir només els camps necessaris
         const resource = await getHal("/products?projection=productSummary", this.authProvider);
-        
+
         const embedded = resource.embeddedArray("products");
         if (!embedded) return [];
-        
+
         return mergeHalArray<Product>(embedded);
     }
 
