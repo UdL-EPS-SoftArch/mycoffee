@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/lib/authProvider";
 import halfred, {Resource} from "halfred";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || "http://127.0.0.1:8080";
@@ -49,3 +50,18 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
 
     return halfred.parse(await res.json());
 }
+
+export async function deleteHal(uri: string, authProvider: AuthProvider): Promise<void> {
+    const auth = await authProvider.getAuth();
+    const headers: Record<string, string> = auth ? { Authorization: auth } : {};
+    
+    const response = await fetch(`${API_BASE_URL}${uri}`, {
+        method: 'DELETE',
+        headers,
+    });
+    
+    if (!response.ok) {
+        throw new Error(`DELETE ${uri} failed: ${response.status}`);
+    }
+}
+
