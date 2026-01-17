@@ -41,10 +41,9 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
         cache: "no-store",
     });
 
-    // --- CORRECCIÓ: Llegim el missatge d'error del backend ---
     if (!res.ok) {
         const errorText = await res.text();
-        console.error("❌ BACKEND ERROR:", errorText); // Mira la consola del navegador!
+        console.error("BACKEND ERROR:", errorText);
         throw new Error(`HTTP ${res.status} posting. Details: ${errorText}`);
     }
 
@@ -54,6 +53,7 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
 export async function patchHal(path: string, body: any, authProvider: { getAuth: () => Promise<string | null> }) {
     const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
     const authorization = await authProvider.getAuth();
+
     const res = await fetch(url, {
         method: "PATCH",
         headers: {
@@ -64,10 +64,34 @@ export async function patchHal(path: string, body: any, authProvider: { getAuth:
         body: JSON.stringify(body),
         cache: "no-store",
     });
+
     if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText || res.statusText}`);
+        const errorText = await res.text();
+        console.error("BACKEND ERROR:", errorText);
+        throw new Error(`HTTP ${res.status} patching. Details: ${errorText}`);
     }
-    const text = await res.text();
-    return text ? halfred.parse(JSON.parse(text)) : {} as any;
+
+    return halfred.parse(await res.json());
+}
+
+export async function deleteHal(path: string, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+
+    const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Accept": "application/hal+json",
+            ...(authorization ? { Authorization: authorization } : {}),
+        },
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("BACKEND ERROR:", errorText);
+        throw new Error(`HTTP ${res.status} deleting. Details: ${errorText}`);
+    }
+    if (res.status === 204) return null;
+    return halfred.parse(await res.json());
 }

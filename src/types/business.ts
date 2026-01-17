@@ -1,15 +1,17 @@
 import { Resource } from "halfred";
+import { UserEntity } from "./user";
 
-export interface BusinessEntity {
+export interface BusinessEntity extends UserEntity {
     name: string;
     address: string;
-    status?: "Open" | "Closed"; // Computed status from backend
-    registrationStatus?: "APPLIED" | "ACCEPTED" | "REJECTED"; // Real DB status
+    status?: "Open" | "Closed";
+    registrationStatus?: "APPLIED" | "ACCEPTED" | "REJECTED";
     rating?: number;
     hasWifi?: boolean;
     capacity?: number;
-    ownerId?: string; // Computed ownerId from backend
+    ownerId?: string;
     imageUrl?: string;
+    image?: string;
     openingTime?: string;
     closingTime?: string;
 }
