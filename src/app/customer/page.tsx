@@ -87,7 +87,7 @@ export default function CustomerDashboard() {
                 {/* Opciones principales */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {/* Mi Perfil */}
-                    <Link href="/customer/id" className="group">
+                    <Link href="/profile" className="group">
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border-2 border-transparent hover:border-blue-200 hover:-translate-y-2">
                             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-2xl mx-auto mb-6 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors flex items-center justify-center">
                                 <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
