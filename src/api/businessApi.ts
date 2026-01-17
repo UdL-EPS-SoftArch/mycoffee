@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal, patchHal, deleteHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal, patchHal, deleteHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { Business, BusinessEntity } from "@/types/business";
 
