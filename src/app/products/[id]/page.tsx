@@ -8,32 +8,9 @@ import { faArrowLeft, faStar, faLeaf, faExclamationTriangle, faBarcode, faCheckC
 import { ProductImage } from "./ProductImage";
 import { ImageUpload } from "./ImageUpload";
 import { serverAuthProvider } from "@/lib/authProvider";
-
-// ✅ NEW imports
-import { BasketService } from "@/api/basketApi";
-import { redirect } from "next/navigation";
+import AddToBasketForm from "./AddToBasketForm";
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
-
-// ✅ NEW Server Action (no "use client")
-async function addToBasket(formData: FormData) {
-    "use server";
-
-    const productId = String(formData.get("productId") || "");
-    const productName = String(formData.get("productName") || "");
-
-    // NOTE: for now we only create/get a basket and redirect.
-    // Adding actual basket items requires a backend endpoint like POST /baskets/{id}/items.
-    const basketService = new BasketService(serverAuthProvider);
-
-    // Create a basket (minimal working change). Replace demo-user with real username when available.
-    await basketService.createBasket({
-        customer: "/customers/demo-user",
-    });
-
-    console.log(`Add to Basket clicked for product ${productName} (${productId})`);
-    redirect("/baskets");
-}
 
 export default async function ProductDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -70,7 +47,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
                     {/* COLUMNA IZQUIERDA (2/3): Información Principal */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* PRODUCT IMAGE - carrega des de l'endpoint /products/{id}/image */}
+                        {/* PRODUCT IMAGE */}
                         <div className="relative w-full h-64 md:h-80 lg:h-96 bg-gray-100 dark:bg-zinc-800 rounded-xl overflow-hidden">
                             <ProductImage
                                 src={`${API_BASE_URL}/products/${params.id}/image`}
@@ -133,7 +110,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
                         {/* INGREDIENTES Y ALÉRGENOS */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                            {/* Ingredientes (Siempre visible si hay) */}
+                            {/* Ingredientes */}
                             {product.ingredients && product.ingredients.length > 0 && (
                                 <Card className="h-full">
                                     <CardHeader className="pb-2">
@@ -157,7 +134,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
                                 </Card>
                             )}
 
-                            {/* Alérgenos (Lógica modificada) */}
+                            {/* Alérgenos */}
                             <Card className={`h-full transition-colors ${hasAllergens ? 'border-red-100 dark:border-red-900/30 bg-red-50/30 dark:bg-red-900/5' : 'border-gray-100 dark:border-gray-800'}`}>
                                 <CardHeader className="pb-2">
                                     <CardTitle className={`text-base font-semibold flex items-center gap-2 ${hasAllergens ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
@@ -225,22 +202,11 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
                                     </div>
                                 )}
 
-                                {/* ✅ ONLY CHANGE HERE: Button -> form + submit */}
-                                <form action={addToBasket}>
-                                    <input type="hidden" name="productId" value={params.id} />
-                                    <input type="hidden" name="productName" value={product.name} />
-
-                                    <Button
-                                        type="submit"
-                                        className="w-full font-bold text-lg h-12 shadow-blue-200 dark:shadow-none"
-                                        size="lg"
-                                        disabled={!product.available || (product.stock !== undefined && product.stock <= 0)}
-                                    >
-                                        {product.available && (product.stock === undefined || product.stock > 0)
-                                            ? "Add to Basket"
-                                            : "Unavailable"}
-                                    </Button>
-                                </form>
+                                <AddToBasketForm
+                                    productId={params.id}
+                                    productName={product.name}
+                                    isAvailable={!!product.available && (product.stock === undefined || product.stock > 0)}
+                                />
                             </CardContent>
                         </Card>
 
