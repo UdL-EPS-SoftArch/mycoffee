@@ -9,7 +9,31 @@ import { ProductImage } from "./ProductImage";
 import { ImageUpload } from "./ImageUpload";
 import { serverAuthProvider } from "@/lib/authProvider";
 
+// ✅ NEW imports
+import { BasketService } from "@/api/basketApi";
+import { redirect } from "next/navigation";
+
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
+
+// ✅ NEW Server Action (no "use client")
+async function addToBasket(formData: FormData) {
+    "use server";
+
+    const productId = String(formData.get("productId") || "");
+    const productName = String(formData.get("productName") || "");
+
+    // NOTE: for now we only create/get a basket and redirect.
+    // Adding actual basket items requires a backend endpoint like POST /baskets/{id}/items.
+    const basketService = new BasketService(serverAuthProvider);
+
+    // Create a basket (minimal working change). Replace demo-user with real username when available.
+    await basketService.createBasket({
+        customer: "/customers/demo-user",
+    });
+
+    console.log(`Add to Basket clicked for product ${productName} (${productId})`);
+    redirect("/baskets");
+}
 
 export default async function ProductDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -201,15 +225,22 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
                                     </div>
                                 )}
 
-                                <Button
-                                    className="w-full font-bold text-lg h-12 shadow-blue-200 dark:shadow-none"
-                                    size="lg"
-                                    disabled={!product.available || (product.stock !== undefined && product.stock <= 0)}
-                                >
-                                    {product.available && (product.stock === undefined || product.stock > 0)
-                                        ? "Add to Basket"
-                                        : "Unavailable"}
-                                </Button>
+                                {/* ✅ ONLY CHANGE HERE: Button -> form + submit */}
+                                <form action={addToBasket}>
+                                    <input type="hidden" name="productId" value={params.id} />
+                                    <input type="hidden" name="productName" value={product.name} />
+
+                                    <Button
+                                        type="submit"
+                                        className="w-full font-bold text-lg h-12 shadow-blue-200 dark:shadow-none"
+                                        size="lg"
+                                        disabled={!product.available || (product.stock !== undefined && product.stock <= 0)}
+                                    >
+                                        {product.available && (product.stock === undefined || product.stock > 0)
+                                            ? "Add to Basket"
+                                            : "Unavailable"}
+                                    </Button>
+                                </form>
                             </CardContent>
                         </Card>
 
