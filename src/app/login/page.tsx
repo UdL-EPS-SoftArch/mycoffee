@@ -20,30 +20,40 @@ type FormValues = {
 export default function LoginPage() {
     const router = useRouter();
     const { setUser } = useAuth();
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>();
-    const [ errorMessage, setErrorMessage ] = useState<string | null>(null);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<FormValues>();
+
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     async function login(username: string, password: string) {
         setErrorMessage(null);
+
         const authorization = `Basic ${btoa(`${username}:${password}`)}`;
+
         setCookie("MYCOFFEE_AUTH", authorization, {
             path: "/",
-            secure: true,
-            sameSite: "strict",
-            httpOnly: false,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
         });
+
         const service = new UsersService(clientAuthProvider());
         const user = await service.getCurrentUser();
+
         setUser(user);
+        return user;
     }
 
-    const onSubmit: SubmitHandler<FormValues> = (data) => {
-        login(data.username, data.password).then(() => {
-            router.push(`/users/${data.username}`);
-        }).catch(() => {
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        try {
+            await login(data.username, data.password);
+            router.push("/profile");
+        } catch {
             deleteCookie("MYCOFFEE_AUTH");
             setErrorMessage("Login failed");
-        });
+        }
     };
 
     return (
@@ -52,21 +62,31 @@ export default function LoginPage() {
                 <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
                     <Card className="w-full max-w-md">
                         <CardHeader>
-                            <CardTitle>login</CardTitle>
+                            <CardTitle>Login</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-                                {errorMessage && ( // Display error message if present
-                                    <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
+                            <form
+                                onSubmit={handleSubmit(onSubmit)}
+                                className="grid gap-4"
+                            >
+                                {errorMessage && (
+                                    <p className="text-sm text-red-600">
+                                        {errorMessage}
+                                    </p>
                                 )}
+
                                 <div>
-                                    <Label htmlFor="username">Username</Label> {/* Changed htmlFor to username */}
+                                    <Label htmlFor="username">Username</Label>
                                     <Input
                                         id="username"
-                                        {...register("username", { required: "Username is required" })}
+                                        {...register("username", {
+                                            required: "Username is required",
+                                        })}
                                     />
                                     {errors.username && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.username.message}</p>
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.username.message}
+                                        </p>
                                     )}
                                 </div>
 
@@ -76,16 +96,22 @@ export default function LoginPage() {
                                         id="password"
                                         type="password"
                                         {...register("password", {
-                                            required: "Password is required"
+                                            required: "Password is required",
                                         })}
                                     />
                                     {errors.password && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.password.message}
+                                        </p>
                                     )}
                                 </div>
 
-                                <Button type="submit" className="mt-2" disabled={isSubmitting}>
-                                    {isSubmitting ? "logging in..." : "login"}
+                                <Button
+                                    type="submit"
+                                    className="mt-2"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Logging in..." : "Login"}
                                 </Button>
                             </form>
                         </CardContent>

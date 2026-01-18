@@ -1,29 +1,66 @@
 "use client";
 
-import ProfileHero from '@/app/profile/components/ProfileHero';
-import ProfileOptions from '@/app/profile/components/ProfileOptions';
-import Footer from "@/app/components/Footer";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { UsersService } from "@/api/userApi";
+import { clientAuthProvider } from "@/lib/authProvider";
+import { User } from "@/types/user";
+import UserProfile from "@/app/components/UserProfile";
 
 export default function ProfilePage() {
-    return (
-        <div className="relative min-h-screen flex flex-col">
-            {/* Background */}
-            <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                    backgroundImage:
-                        "url('https://images.unsplash.com/photo-1511920170033-f8396924c348')",
-                }}
-            />
-            <div className="absolute inset-0 bg-black/60" />
+    const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-            {/* Content */}
-            <main className="relative z-10 flex-grow">
-                <ProfileHero />
-                <ProfileOptions />
-            </main>
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                setIsLoading(true);
 
-            <Footer />
-        </div>
-    );
+                const authProvider = clientAuthProvider();
+                const service = new UsersService(authProvider);
+                const currentUser = await service.getCurrentUser();
+
+                if (!currentUser) {
+                    router.push("/login");
+                    return;
+                }
+
+                setUser(currentUser);
+            } catch {
+                router.push("/login");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCurrentUser();
+    }, [router]);
+
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">
+                        Loading profile...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+                <div className="text-center">
+                    <p className="text-gray-600 dark:text-gray-400">
+                        Redirecting...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    return <UserProfile user={user} />;
 }
