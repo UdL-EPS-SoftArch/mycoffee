@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal, patchHal, deleteHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { Business, BusinessEntity } from "@/types/business";
 
@@ -23,5 +23,14 @@ export class BusinessService {
     async createBusiness(business: BusinessEntity): Promise<Business> {
         const resource = await postHal('/businesses', business as Business, this.authProvider);
         return mergeHal<Business>(resource);
+    }
+
+    async updateBusiness(id: string, business: Partial<BusinessEntity>): Promise<Business> {
+        const resource = await patchHal(`/businesses/${id}`, business, this.authProvider);
+        return mergeHal<Business>(resource);
+    }
+
+    async deleteBusiness(id: string): Promise<void> {
+        await deleteHal(`/businesses/${id}`, this.authProvider);
     }
 }
