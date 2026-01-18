@@ -6,6 +6,24 @@ export function mergeHal<T>(obj: Resource): (T & Resource) {
     return Object.assign(obj, halfred.parse(obj)) as T & Resource;
 }
 
+// Utilidad para construir el header Basic a partir de lo que devuelva el AuthProvider
+function buildBasicAuthHeader(raw: string | null): string | null {
+    if (!raw) return null;
+
+    // Si ya viene con el prefijo "Basic ", lo respetamos
+    if (raw.startsWith("Basic ")) {
+        return raw;
+    }
+
+    // En entorno de prácticas, asumimos que raw = "usuario:password"
+    // y lo codificamos en Base64: "Basic base64(usuario:password)"
+    const base64 = typeof window !== "undefined"
+        ? window.btoa(raw)
+        : Buffer.from(raw, "utf-8").toString("base64");
+
+    return `Basic ${base64}`;
+}
+
 export function mergeHalArray<T>(objs: Resource[]): (T & Resource)[] {
     return objs.map(o => Object.assign(o, halfred.parse(o)) as T & Resource);
 }
