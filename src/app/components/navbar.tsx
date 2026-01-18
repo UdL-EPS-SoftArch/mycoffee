@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/app/components/authentication";
 import Loginbar from "@/app/components/loginbar";
+import { UserIcon } from "lucide-react";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -21,7 +22,6 @@ export default function Navbar() {
         { href: "/customer/register", label: "Register" },
         { href: "/customer", label: "Users", roles: ["ROLE_USER"] },
         { href: "/customer/login", label: "Users", roles: ["ROLE_USER"] },
-
     ];
 
     return (
@@ -61,10 +61,24 @@ export default function Navbar() {
                         })}
                 </div>
 
-                <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-4">
+                    {/* Botón de Perfil - Solo visible si el usuario está logueado */}
+                    {user && (
+                        <Link
+                            href="/profile"
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                                pathname === "/profile"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            }`}
+                        >
+                            <UserIcon className="w-4 h-4" />
+                            <span className="font-medium">Profile</span>
+                        </Link>
+                    )}
+
                     <Loginbar />
                 </div>
-
             </div>
         </nav>
     );
