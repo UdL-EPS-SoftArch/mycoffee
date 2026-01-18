@@ -19,6 +19,7 @@ export async function getHal(path: string, authProvider: { getAuth: () => Promis
             "Accept": "application/hal+json",
             ...(authorization ? { Authorization: authorization } : {}), },
         cache: "no-store",
+        credentials: 'include',
     });
     if (!res.ok) {
         throw new Error(`HTTP ${res.status} fetching ${url}`);
@@ -39,6 +40,7 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
         },
         body: JSON.stringify(body),
         cache: "no-store",
+        credentials: 'include',
     });
 
     // --- CORRECCIÓ: Llegim el missatge d'error del backend ---
@@ -58,6 +60,7 @@ export async function deleteHal(uri: string, authProvider: AuthProvider): Promis
     const response = await fetch(`${API_BASE_URL}${uri}`, {
         method: 'DELETE',
         headers,
+        credentials: 'include',
     });
     
     if (!response.ok) {
