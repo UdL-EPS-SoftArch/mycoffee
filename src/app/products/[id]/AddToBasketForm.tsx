@@ -20,6 +20,7 @@ interface AddToBasketFormProps {
     }: AddToBasketFormProps) {
     const router = useRouter();
     const { user } = useAuth();
+    const [quantity, setQuantity] = React.useState(1);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,10 +57,10 @@ interface AddToBasketFormProps {
         await basketItemService.addItem({
             basket: `/baskets/${userBasket.id}`,
             product: `/products/${productId}`,
-            quantity: 1,
+            quantity: quantity,
         });
 
-        console.log(`Added ${productName} to basket`);
+        console.log(`Added ${quantity} x ${productName} to basket`);
         router.push("/baskets");
         } catch (error) {
         console.error("Error:", error);
@@ -68,7 +69,18 @@ interface AddToBasketFormProps {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex items-center space-x-4">
+            <label htmlFor="quantity" className="font-medium">Quantity:</label>
+            <input
+                type="number"
+                id="quantity"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                className="w-20 p-2 border rounded-md dark:bg-slate-800"
+            />
+        </div>
         <Button
             type="submit"
             className="w-full font-bold text-lg h-12 shadow-blue-200 dark:shadow-none"

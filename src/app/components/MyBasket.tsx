@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BasketItemService } from "@/api/basketItemApi";
+import { ProductService } from "@/api/productApi";
 import { clientAuthProvider } from "@/lib/authProvider";
 import { Button } from "@/components/ui/button";
 
@@ -24,14 +25,32 @@ export default function MyBasket({ basketId }: MyBasketProps) {
     const fetchItems = async () => {
       try {
         const basketItemService = new BasketItemService(clientAuthProvider());
+        const productService = new ProductService(clientAuthProvider());
         const rawItems = await basketItemService.getItemsByBasket(basketId);
         
-        // TODO: fetch product details for each item
-        const displayItems = rawItems.map((item: any) => ({
-          id: item.id,
-          productName: "Product", // Fetch from item.product URI
-          productPrice: 4.5,       // Fetch from product
-          quantity: item.quantity || 1,
+        const displayItems = await Promise.all(rawItems.map(async (item: any) => {
+          let productName = "Unknown Product";
+          let productPrice = 0;
+
+          try {
+            // item.product usually contains the URI from HAL
+            const productUri = item._links?.product?.href;
+            if (productUri) {
+              const productId = productUri.split("/").pop();
+              const product = await productService.getProductById(productId);
+              productName = product.name;
+              productPrice = product.price;
+            }
+          } catch (e) {
+            console.error("Error fetching product details", e);
+          }
+
+          return {
+            id: item.id || Math.random(),
+            productName,
+            productPrice,
+            quantity: item.quantity || 1,
+          };
         }));
         
         setItems(displayItems);
