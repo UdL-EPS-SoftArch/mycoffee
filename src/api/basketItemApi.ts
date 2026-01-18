@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal } from "@/lib/halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { BasketItem, BasketItemEntity } from "@/types/basketItem";
 
@@ -20,7 +20,7 @@ export class BasketItemService {
         const resource = await getHal(`/basketItems/${itemId}`, this.authProvider);
         const item = mergeHal<BasketItem>(resource);
         item.quantity = quantity;
-        
+
         const updated = await postHal(`/basketItems/${itemId}`, item, this.authProvider);
         return mergeHal<BasketItem>(updated);
     }
