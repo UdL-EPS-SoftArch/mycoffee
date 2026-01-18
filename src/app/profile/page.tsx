@@ -1,9 +1,7 @@
 "use client";
 
-// @ts-ignore
-import ProfileHero from "/components/ProfileHero";
-// @ts-ignore
-import ProfileOptions from "/components/ProfileOptions";
+import ProfileHero from '@/app/profile/components/ProfileHero';
+import ProfileOptions from '@/app/profile/components/ProfileOptions';
 import Footer from "@/app/components/Footer";
 
 export default function ProfilePage() {
